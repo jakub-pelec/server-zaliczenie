@@ -8,7 +8,7 @@ app.listen(PORT, (): void => {
 	console.log(`server listening on port ${PORT}`);
 })
 
-app.post('/create_account', async(request: Request, response: Response) => {
+app.post('/create_account', async(request: Request, response: Response): Promise<Response> => {
 	const {body: {balance, accountNumber, name, email}} = request;
 	if(!balance || !accountNumber || !name || !email) {
 		return response.status(403).send('Missing parameters.')
@@ -21,7 +21,7 @@ app.post('/create_account', async(request: Request, response: Response) => {
 	}
 })
 
-app.post('/get_balance', async(request: Request, response: Response) => {
+app.post('/get_balance', async(request: Request, response: Response): Promise<Response> => {
 	const {body: {id}} = request;
 	if(!id) {
 		return response.status(403).send('Missing parameter.');
