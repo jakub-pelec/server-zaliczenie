@@ -36,5 +36,8 @@ app.post('/get_balance', async(request: Request, response: Response): Promise<Re
 	} catch(e) {
 		return response.status(500).send('Something went wrong.');
 	}
-
 }) 
+
+app.get('/siema', async(reqest: Request, response: Response): Promise<Response> => {
+	return response.status(200).send('Siema');
+})
