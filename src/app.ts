@@ -1,7 +1,7 @@
 import express, {Application, Request, Response} from 'express';
 import bodyParser from 'body-parser';
 import {getBalance, createAccount} from './actions';
-const PORT: number = 5000;
+const PORT: string = process.env.PORT || '5000';
 
 const app: Application = express();
 
