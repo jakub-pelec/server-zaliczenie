@@ -44,5 +44,6 @@ app.get('/siema', async(reqest: Request, response: Response): Promise<Response> 
 
 app.post('/daj', async(request: Request, response: Response): Promise<Response> => {
 	const {body} = request;
+	console.log(request.body);
 	return response.status(200).send(body);
 });

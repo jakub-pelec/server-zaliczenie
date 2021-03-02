@@ -10,8 +10,7 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "concurrently \"tsc -w\" \"nodemon dist/src/app.js\"",
 		"build": "tsc",
-		"dev": "node dist/src/app.js",
-		"postinstall": "tsc"
+		"dev": "node dist/src/app.js"
 	},
 	"keywords": [],
 	"author": "",
