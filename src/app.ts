@@ -41,3 +41,8 @@ app.post('/get_balance', async(request: Request, response: Response): Promise<Re
 app.get('/siema', async(reqest: Request, response: Response): Promise<Response> => {
 	return response.status(200).send('Siema');
 })
+
+app.post('/daj', async(request: Request, response: Response): Promise<Response> => {
+	const {body} = request;
+	return response.status(200).send(body);
+});
