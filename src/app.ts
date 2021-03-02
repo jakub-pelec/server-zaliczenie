@@ -1,8 +1,11 @@
 import express, {Application, Request, Response} from 'express';
+import bodyParser from 'body-parser';
 import {getBalance, createAccount} from './actions';
 const PORT: number = 5000;
 
 const app: Application = express();
+
+app.use(bodyParser.json());
 
 app.listen(PORT, (): void => {
 	console.log(`server listening on port ${PORT}`);
