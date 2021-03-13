@@ -15,11 +15,9 @@ export const getBalance = async(request: Request, response: Response): Promise<R
 
 export const transferBalance = async(request: Request, response: Response): Promise<Response> => {
 	const {body: {amount, from, to}} = request;
-	let numberAmount;
-	try {
-		numberAmount = parseInt(amount, 10);
-	} catch(e) {
-		return response.status(403).send({error: 'Amount must be a number'});
+	const numberAmount = parseInt(amount, 10);
+	if(isNaN(numberAmount)) {
+		return response.status(403).send({error: 'Amount must be number'});
 	}
 	if(from === to) {
 		return response.status(403).send({error: 'Cannot transfer to yourself.'});
