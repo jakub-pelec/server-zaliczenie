@@ -13,7 +13,7 @@ export const getBalance = async(request: Request, response: Response): Promise<R
 	}
 }
 
-export const transferBalance = async(response: Response, request: Request): Promise<Response> => {
+export const transferBalance = async(request: Request, response: Response): Promise<Response> => {
 	const {body: {amount, from, to}} = request;
 	try {
 		const fromPrefix = await firestore.collection(USERS).doc(from);
