@@ -13,13 +13,11 @@ export const loginHandler = async(request: Request, response: Response): Promise
 }
 
 export const createAccountHandler = async(request: Request, response: Response): Promise<Response> => {
-	const {body: {email, password, balance, accountNumber, name}} = request;
+	const {body: {email, password, balance}} = request;
 	try {
 		await auth.createUserWithEmailAndPassword(email, password);
 		await firestore.collection(USERS).doc(email).set({
 			balance,
-			accountNumber,
-			name,
 			email
 		});
 		return response.status(200).send();
