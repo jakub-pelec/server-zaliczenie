@@ -15,6 +15,12 @@ export const getBalance = async(request: Request, response: Response): Promise<R
 
 export const transferBalance = async(request: Request, response: Response): Promise<Response> => {
 	const {body: {amount, from, to}} = request;
+	let numberAmount;
+	try {
+		numberAmount = parseInt(amount, 10);
+	} catch(e) {
+		return response.status(403).send({error: 'Amount must be a number'});
+	}
 	if(from === to) {
 		return response.status(403).send({error: 'Cannot transfer to yourself.'});
 	}
@@ -23,14 +29,14 @@ export const transferBalance = async(request: Request, response: Response): Prom
 		const toPrefix = await firestore.collection(USERS).doc(to);
 		const {balance: fromBalance} = await (await fromPrefix.get()).data();
 		const {balance: toBalance} = await (await toPrefix.get()).data();
-		if(fromBalance < amount) {
+		if(fromBalance < numberAmount) {
 			return response.status(403).send({error: {code: 'db/balance-too-low', message: 'Balance too low'}});
 		}
 		const batch = firestore.batch();
-		await batch.update(fromPrefix, {balance: fromBalance - amount});
-		await batch.update(toPrefix, {balance: toBalance + amount});
+		await batch.update(fromPrefix, {balance: fromBalance - numberAmount});
+		await batch.update(toPrefix, {balance: toBalance + numberAmount});
 		await batch.commit();
-		return response.status(200).send({messsage: `New balance: ${fromBalance - amount}`});
+		return response.status(200).send({messsage: `New balance: ${fromBalance - numberAmount}`});
 	} catch(e) {
 		return response.status(403).send({error: e});
 	}
