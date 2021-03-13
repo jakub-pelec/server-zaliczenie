@@ -20,7 +20,7 @@ export const createAccountHandler = async(request: Request, response: Response):
 			balance,
 			email
 		});
-		return response.status(200).send();
+		return response.status(200).send({status: 'success'});
 	} catch(e) {
 		return response.status(403).send({error: e});
 	}
