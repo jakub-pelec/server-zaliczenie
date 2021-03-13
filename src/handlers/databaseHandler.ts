@@ -9,7 +9,7 @@ export const getBalance = async(request: Request, response: Response): Promise<R
 		const {balance} = await documentSnapshot.data();
 		return response.status(200).send({balance});
 	} catch(e) {
-		return response.status(403).send();
+		return response.status(403).send({error: e});
 	}
 }
 
@@ -21,7 +21,7 @@ export const transferBalance = async(response: Response, request: Request): Prom
 		const {balance: fromBalance} = await (await fromPrefix.get()).data();
 		const {balance: toBalance} = await (await toPrefix.get()).data();
 		if(fromBalance < amount) {
-			return response.status(403).send({message: 'Balance too low'});
+			return response.status(403).send({error: {code: 'db/balance-too-low', message: 'Balance too low'}});
 		}
 		const batch = firestore.batch();
 		await batch.update(fromPrefix, {balance: fromBalance - amount});
@@ -29,6 +29,6 @@ export const transferBalance = async(response: Response, request: Request): Prom
 		await batch.commit();
 		return response.status(200).send({messsage: `New balance: ${fromBalance - amount}`});
 	} catch(e) {
-		return response.status(403).send({message: `Something went wrong`});
+		return response.status(403).send({error: e});
 	}
 }

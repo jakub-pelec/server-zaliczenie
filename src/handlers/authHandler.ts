@@ -6,9 +6,9 @@ export const loginHandler = async(request: Request, response: Response): Promise
 	const {body: {email, password}} = request;
 	try {
 		await auth.signInWithEmailAndPassword(email, password);
-		return response.status(200).send();
+		return response.status(200).send({status: 'success'});
 	} catch(e) {
-		return response.status(403).send();
+		return response.status(403).send({error: e});
 	}
 }
 
