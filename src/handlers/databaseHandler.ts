@@ -15,6 +15,9 @@ export const getBalance = async(request: Request, response: Response): Promise<R
 
 export const transferBalance = async(request: Request, response: Response): Promise<Response> => {
 	const {body: {amount, from, to}} = request;
+	if(from === to) {
+		return response.status(403).send({error: 'Cannot transfer to yourself.'});
+	}
 	try {
 		const fromPrefix = await firestore.collection(USERS).doc(from);
 		const toPrefix = await firestore.collection(USERS).doc(to);
