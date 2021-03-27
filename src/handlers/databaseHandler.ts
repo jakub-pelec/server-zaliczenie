@@ -16,12 +16,17 @@ export const getBalance = async(request: Request, response: Response): Promise<R
 
 export const withdrawMoney = async(request: Request, response: Response) => {
 	const {body: {accountNumber, amount}} = request;
-	const documentQuery = await firestore.collection(USERS).doc(accountNumber).get();
+	const normalizedAccountNumber = typeof accountNumber === 'number' ? accountNumber.toString(10).replace(/\s/g,'') : accountNumber.replace(/\s/g,'');
+	const normalizedAmount = typeof amount === 'string' ? parseInt(amount, 10) : amount;
+	if(isNaN(normalizedAmount)) {
+		return response.status(403).send(createResponse('error', 'Amount must be a valid number'));
+	}
+	const documentQuery = await firestore.collection(USERS).doc(normalizedAccountNumber).get();
 	if(!documentQuery.exists) {
 		return response.status(403).send(createResponse('error', 'This account doesn\'t exist'));
 	}
 	const documentData = documentQuery.data();
-	if(documentData.balance < amount) {
+	if(documentData.balance < normalizedAmount) {
 		return response.status(403).send(createResponse('error', 'Balance is too low'));
 	}
 	
@@ -29,16 +34,18 @@ export const withdrawMoney = async(request: Request, response: Response) => {
 
 export const transferBalance = async(request: Request, response: Response): Promise<Response> => {
 	const {body: {amount, from, to}} = request;
-	const numberAmount = parseInt(amount, 10);
+	const numberAmount = typeof amount === 'string' ? parseInt(amount, 10) : amount;
+	const normalizedFrom = typeof from === 'number' ? from.toString(10).replace(/\s/g,'') : from.replace(/\s/g,'');
+	const normalizedTo = typeof to === 'number' ? to.toString(10).replace(/\s/g,'') : to.replace(/\s/g,'');
 	if(isNaN(numberAmount)) {
 		return response.status(403).send(createResponse('error', 'Amount must be a number'));
 	}
-	if(from === to) {
+	if(normalizedFrom === normalizedTo) {
 		return response.status(403).send(createResponse('error', 'You cannot transfer money to yourself'));
 	}
 	try {
-		const fromPrefix = await firestore.collection(USERS).doc(from);
-		const toPrefix = await firestore.collection(USERS).doc(to);
+		const fromPrefix = await firestore.collection(USERS).doc(normalizedFrom);
+		const toPrefix = await firestore.collection(USERS).doc(normalizedTo);
 		const {balance: fromBalance} = await (await fromPrefix.get()).data();
 		const {balance: toBalance} = await (await toPrefix.get()).data();
 		if(fromBalance < numberAmount) {
@@ -56,10 +63,15 @@ export const transferBalance = async(request: Request, response: Response): Prom
 
 export const addBalance = async(request: Request, response: Response): Promise<Response> => {
 	const {body: {amount, accountNumber}} = request;
+	const numberAmout = parseInt(amount, 10);
+	const normalizedAccountNumber = typeof accountNumber === 'number' ? accountNumber.toString(10).replace(/\s/g,'') : accountNumber.replace(/\s/g,'');
+	if(isNaN(numberAmout)) {
+		return response.status(403).send(createResponse('error', 'Amount must be a valid number'));
+	}
 	try {
-		const documentPrefix = await firestore.collection(USERS).doc(accountNumber);
+		const documentPrefix = await firestore.collection(USERS).doc(normalizedAccountNumber);
 		const {balance} = await (await documentPrefix.get()).data();
-		const newBalance = balance + amount;
+		const newBalance = balance + numberAmout;
 		await documentPrefix.update({balance: newBalance});
 		return response.status(200).send(createResponse('success', `New balance: ${newBalance}`));
 	} catch(e) {

@@ -1,0 +1,12 @@
+POST http://localhost:5000/create_account
+content-type: application/json
+
+{
+    "password": "dupakonia",
+    "firstName": "Jakub",
+    "lastName": "Pelec",
+    "balance": 200,
+    "email": "zenek@gmail.com",
+    "PESEL": "NAURA",
+    "accountNumber": 1234562291234561
+}

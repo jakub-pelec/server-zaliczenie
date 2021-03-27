@@ -1,5 +1,5 @@
 import express, {Application} from 'express';
-import {createAccountHandler} from './src/handlers/authHandler';
+import {createAccountHandler, login} from './src/handlers/authHandler';
 import {getBalance, transferBalance, addBalance, withdrawMoney} from './src/handlers/databaseHandler';
 import bodyParser from 'body-parser';
 
@@ -16,3 +16,4 @@ app.post('/get_balance', getBalance);
 app.post('/transfer', transferBalance);
 app.post('/add_balance', addBalance);
 app.post('/withdraw_money', withdrawMoney);
+app.post('/login', login);
