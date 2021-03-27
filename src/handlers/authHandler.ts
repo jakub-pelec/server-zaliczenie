@@ -26,6 +26,10 @@ export const createAccountHandler = async(request: Request, response: Response):
 	if(!balance || !PESEL || !firstName || !lastName || !email || !password) {
 		return response.status(403).send(createResponse('error', 'Missing parameter'));
 	}
+
+	if(password.length < 6) {
+		return response.status(403).send(createResponse('error', 'Password must be at least 6 characters long'));
+	}
 	const salt = 10;
 	const hash = await bcrypt.hash(password, salt);
 	const documentData: UserDocument = {
