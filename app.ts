@@ -1,6 +1,6 @@
 import express, {Application} from 'express';
-import {createAccountHandler, loginHandler} from './src/handlers/authHandler';
-import {getBalance, transferBalance} from './src/handlers/databaseHandler';
+import {createAccountHandler} from './src/handlers/authHandler';
+import {getBalance, transferBalance, addBalance, withdrawMoney} from './src/handlers/databaseHandler';
 import bodyParser from 'body-parser';
 
 
@@ -12,7 +12,7 @@ app.listen(PORT, (): void => {
 });
 
 app.post('/create_account', createAccountHandler);
-app.post('/login', loginHandler);
-
 app.post('/get_balance', getBalance);
 app.post('/transfer', transferBalance);
+app.post('/add_balance', addBalance);
+app.post('/withdraw_money', withdrawMoney);
