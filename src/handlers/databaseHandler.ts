@@ -14,20 +14,28 @@ export const getBalance = async(request: Request, response: Response): Promise<R
 	}
 }
 
-export const withdrawMoney = async(request: Request, response: Response) => {
+export const withdrawMoney = async(request: Request, response: Response): Promise<Response> => {
 	const {body: {accountNumber, amount}} = request;
 	const normalizedAccountNumber = typeof accountNumber === 'number' ? accountNumber.toString(10).replace(/\s/g,'') : accountNumber.replace(/\s/g,'');
 	const normalizedAmount = typeof amount === 'string' ? parseInt(amount, 10) : amount;
 	if(isNaN(normalizedAmount)) {
 		return response.status(403).send(createResponse('error', 'Amount must be a valid number'));
 	}
-	const documentQuery = await firestore.collection(USERS).doc(normalizedAccountNumber).get();
-	if(!documentQuery.exists) {
+	const documentQuery = firestore.collection(USERS).doc(normalizedAccountNumber);
+	const documentSnapshot = await documentQuery.get();
+	const documentData = await documentSnapshot.data();
+	if(!documentSnapshot.exists) {
 		return response.status(403).send(createResponse('error', 'This account doesn\'t exist'));
 	}
-	const documentData = documentQuery.data();
 	if(documentData.balance < normalizedAmount) {
 		return response.status(403).send(createResponse('error', 'Balance is too low'));
+	}
+	try {
+		const newBalance = documentData.balance - normalizedAmount;
+		await documentQuery.update({balance: newBalance});
+		return response.status(200).send(createResponse('success', '', {balance: newBalance}));
+	} catch (e) {
+		return response.status(403).send(createResponse('error', 'Something went wrong'));
 	}
 	
 };

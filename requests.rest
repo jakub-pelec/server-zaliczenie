@@ -1,11 +1,6 @@
-POST http://localhost:5000/create_account
+POST http://localhost:5000/get_balance
 content-type: application/json
 
 {
-    "password": "kuzka",
-    "firstName": "Jakub",
-    "lastName": "Pelec",
-    "balance": 200,
-    "email": "dadsdsddasdass@gmail.com",
-    "PESEL": "NAURAcurrentNumberString"
+    "accountNumber": "000000000000006"
 }
