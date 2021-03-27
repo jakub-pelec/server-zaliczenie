@@ -13,6 +13,19 @@ export const getBalance = async(request: Request, response: Response): Promise<R
 	}
 }
 
+export const withdrawMoney = async(request: Request, response: Response) => {
+	const {body: {accountNumber, amount}} = request;
+	const documentQuery = await firestore.collection('users').doc(accountNumber).get();
+	if(!documentQuery.exists) {
+		return response.status(403).send({status: 'error', message: 'Account number doesn\'t exist'})
+	}
+	const documentData = documentQuery.data();
+	if(documentData.balance < amount) {
+		return response.status(403).send({status: 'error', message: 'Balance is too low'});
+	}
+	
+};
+
 export const transferBalance = async(request: Request, response: Response): Promise<Response> => {
 	const {body: {amount, from, to}} = request;
 	const numberAmount = parseInt(amount, 10);
