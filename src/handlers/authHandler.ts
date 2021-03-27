@@ -1,6 +1,7 @@
 import {Request, Response} from 'express';
+import firebase from 'firebase';
 import {firestore} from '../firebaseConfig';
-import {USERS} from '../constants/collections';
+import {USERS, DATA} from '../constants/collections';
 import {createResponse} from '../utils/createResponse';
 import bcrypt from 'bcrypt';
 
@@ -14,13 +15,19 @@ interface UserDocument {
 }
 
 export const createAccountHandler = async(request: Request, response: Response): Promise<Response> => {
-	const {body: {balance, accountNumber, PESEL, firstName, lastName, email, password}} = request;
-	if(!balance || !accountNumber || !PESEL || !firstName || !lastName || !email || !password) {
+	const {body: {balance, PESEL, firstName, lastName, email, password}} = request;
+	const dataPrefix = await firestore.collection(DATA).doc(DATA);
+	const {currentNumber} = (await dataPrefix.get()).data();
+
+	const currentNumberString = Number(currentNumber).toString();
+	const newAccountNumber = currentNumberString.padStart(16 - currentNumberString.length, '0');
+	const increment = firebase.firestore.FieldValue.increment(1);
+
+	if(!balance || !PESEL || !firstName || !lastName || !email || !password) {
 		return response.status(403).send(createResponse('error', 'Missing parameter'));
 	}
 	const salt = 10;
 	const hash = await bcrypt.hash(password, salt);
-	const normalizedAccountNumber = typeof accountNumber === 'number' ? Number(accountNumber).toString(10).replace(/\s/g,'') : accountNumber.replace(/\s/g,'');
 	const documentData: UserDocument = {
 		password: hash,
 		balance,
@@ -31,20 +38,15 @@ export const createAccountHandler = async(request: Request, response: Response):
 	}
 
 	const emailDocumentSnapshot = await firestore.collection(USERS).where('email', '==', email).get();
-	const accountNumberDocumentSnapshot = await firestore.collection(USERS).doc(normalizedAccountNumber).get()
-	if(!emailDocumentSnapshot.empty || accountNumberDocumentSnapshot.exists) {
+	if(!emailDocumentSnapshot.empty) {
 		return response.status(403).send(createResponse('error', 'User already exists'));
 	}
-	
-	if(!balance || !accountNumber || !PESEL || !firstName || !lastName){
-		return response.status(403).send(createResponse('error', 'Missing parameter'));
-}
-	if(normalizedAccountNumber.length !== 16) {
-		return response.status(403).send(createResponse('error', 'Account number must be 16 digits long'));
-	}
 	try {
-		await firestore.collection(USERS).doc(normalizedAccountNumber).set(documentData);
-		return response.status(200).send(createResponse('success', 'Account created'));
+		await firestore.collection(USERS).doc(newAccountNumber).set(documentData);
+		await dataPrefix.update({
+			currentNumber: increment
+		})
+		return response.status(200).send(createResponse('success', 'Account created', {accountNumber: newAccountNumber}));
 	} catch(e) {
 		return response.status(403).send(createResponse('error', 'Something went wrong'));
 	}
