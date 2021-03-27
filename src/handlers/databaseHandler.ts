@@ -8,7 +8,7 @@ export const getBalance = async(request: Request, response: Response): Promise<R
 	try {
 		const documentSnapshot = await firestore.collection(USERS).doc(email).get();
 		const {balance} = await documentSnapshot.data();
-		return response.status(200).send(createResponse('success', balance));
+		return response.status(200).send(createResponse('success', '', {balance}));
 	} catch(e) {
 		return response.status(403).send(createResponse('error', 'Something went wrong'));
 	}
