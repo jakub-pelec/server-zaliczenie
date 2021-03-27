@@ -1,7 +1,7 @@
-POST http://localhost:5000/login
+POST http://localhost:5000/withdraw_money
 content-type: application/json
 
 {
-    "email": "gsc@wp.pl",
-    "password": "123456"
+    "accountNumber": "000000000000004",
+    "amount": 1
 }

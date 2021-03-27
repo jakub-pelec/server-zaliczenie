@@ -18,7 +18,7 @@ export const withdrawMoney = async(request: Request, response: Response): Promis
 	const {body: {accountNumber, amount}} = request;
 	const normalizedAccountNumber = typeof accountNumber === 'number' ? accountNumber.toString(10).replace(/\s/g,'') : accountNumber.replace(/\s/g,'');
 	const normalizedAmount = typeof amount === 'string' ? parseInt(amount, 10) : amount;
-	if(isNaN(normalizedAmount)) {
+	if(isNaN(normalizedAmount) || normalizedAmount < 0) {
 		return response.status(403).send(createResponse('error', 'Amount must be a valid number'));
 	}
 	const documentQuery = firestore.collection(USERS).doc(normalizedAccountNumber);
@@ -45,7 +45,7 @@ export const transferBalance = async(request: Request, response: Response): Prom
 	const numberAmount = typeof amount === 'string' ? parseInt(amount, 10) : amount;
 	const normalizedFrom = typeof from === 'number' ? from.toString(10).replace(/\s/g,'') : from.replace(/\s/g,'');
 	const normalizedTo = typeof to === 'number' ? to.toString(10).replace(/\s/g,'') : to.replace(/\s/g,'');
-	if(isNaN(numberAmount)) {
+	if(isNaN(numberAmount) || numberAmount < 0) {
 		return response.status(403).send(createResponse('error', 'Amount must be a number'));
 	}
 	if(normalizedFrom === normalizedTo) {
@@ -73,7 +73,7 @@ export const addBalance = async(request: Request, response: Response): Promise<R
 	const {body: {amount, accountNumber}} = request;
 	const numberAmout = parseInt(amount, 10);
 	const normalizedAccountNumber = typeof accountNumber === 'number' ? accountNumber.toString(10).replace(/\s/g,'') : accountNumber.replace(/\s/g,'');
-	if(isNaN(numberAmout)) {
+	if(isNaN(numberAmout) || numberAmout < 0) {
 		return response.status(403).send(createResponse('error', 'Amount must be a valid number'));
 	}
 	try {
