@@ -15,7 +15,7 @@ interface UserDocument {
 }
 
 export const createAccountHandler = async(request: Request, response: Response): Promise<Response> => {
-	const {body: {balance, PESEL, firstName, lastName, email, password}} = request;
+	const {body: {PESEL, firstName, lastName, email, password}} = request;
 	const dataPrefix = await firestore.collection(DATA).doc(DATA);
 	const {currentNumber} = (await dataPrefix.get()).data();
 
@@ -23,7 +23,7 @@ export const createAccountHandler = async(request: Request, response: Response):
 	const newAccountNumber = currentNumberString.padStart(16 - currentNumberString.length, '0');
 	const increment = firebase.firestore.FieldValue.increment(1);
 
-	if(!balance || !PESEL || !firstName || !lastName || !email || !password) {
+	if(!PESEL || !firstName || !lastName || !email || !password) {
 		return response.status(403).send(createResponse('error', 'Missing parameter'));
 	}
 
@@ -34,7 +34,7 @@ export const createAccountHandler = async(request: Request, response: Response):
 	const hash = await bcrypt.hash(password, salt);
 	const documentData: UserDocument = {
 		password: hash,
-		balance,
+		balance: 0,
 		firstName,
 		lastName,
 		PESEL,
