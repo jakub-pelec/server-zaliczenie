@@ -1,6 +1,7 @@
-POST http://localhost:5000/get_balance
+POST http://localhost:5000/login
 content-type: application/json
 
 {
-    "accountNumber": "000000000000006"
+    "email": "gsc@wp.pl",
+    "password": "123456"
 }

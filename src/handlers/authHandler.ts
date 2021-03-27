@@ -68,7 +68,7 @@ export const login = async(request: Request, response: Response): Promise<Respon
 			const data = userDoc.data();
 			const isOk = await bcrypt.compare(password, data.password);
 			if(isOk) {
-				return response.status(200).send(createResponse('success', 'You are logged in', {accountNumber: data.acccountNumber}));
+				return response.status(200).send(createResponse('success', 'You are logged in', {accountNumber: data.accountNumber}));
 			}
 			return response.status(403).send(createResponse('error', 'Wrong password'));
 		}
