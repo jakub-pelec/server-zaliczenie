@@ -4,9 +4,9 @@ import {USERS} from '../constants/collections';
 import {createResponse} from '../utils/createResponse';
 
 export const getBalance = async(request: Request, response: Response): Promise<Response> => {
-	const {body: {email}} = request;
+	const {body: {accountNumber}} = request;
 	try {
-		const documentSnapshot = await firestore.collection(USERS).doc(email).get();
+		const documentSnapshot = await firestore.collection(USERS).doc(accountNumber).get();
 		const {balance} = await documentSnapshot.data();
 		return response.status(200).send(createResponse('success', '', {balance}));
 	} catch(e) {
